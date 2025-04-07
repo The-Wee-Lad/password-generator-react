@@ -19,7 +19,7 @@ const map = {
   "random": "256-Bit-Random"
 }
 const defaultSetting = { LCharacters: true, Numbers: true, UCharacters:true };
-
+let timer = null;
 
 function App() {
   const [disableSlider, setDisableSlider] = useState(false);
@@ -45,7 +45,7 @@ function App() {
   }, [parameters, length, setPassword]);
   useEffect(passwordGenerator, [parameters, length, passwordGenerator]);
   return (
-    <div className='m-auto text-center mt-20 min-[688px]:w-[75%] min-[860px]:w-[60%] xl:w-[42%]  min-[1029px]:w-[50%] bg-[white] p-2 border-2 border-gray-500 flex flex-col items-center gap-2'>
+    <div className=' select-none m-auto text-center mt-20 min-[688px]:w-[75%] min-[860px]:w-[60%] xl:w-[42%]  min-[1029px]:w-[50%] bg-[white] p-2 border-2 border-gray-500 flex flex-col items-center gap-2'>
       {copied && <Notification/>}
       <h1 className='text-4xl font-bold text-center' style={{ fontFamily: "'Staatliches', sans-serif" }}>Password Generator</h1>
       <TextArea
@@ -55,8 +55,9 @@ function App() {
           window.navigator.clipboard.writeText(password);
           textArea.current.select()
           console.log(textArea);
+          clearTimeout(timer);
           showCopied(true);
-          setTimeout(() => {
+          timer = setTimeout(() => {
             showCopied(false);
           }, 3000);
         }} />
