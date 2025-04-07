@@ -55,12 +55,15 @@ function App() {
         copy={() => {
           window.navigator.clipboard.writeText(password);
           textArea.current.select()
-          console.log(textArea);
           clearTimeout(timer.current);
           showCopied(true);
-          timer.current = setTimeout(() => {
-            showCopied(false);
-          }, 3000);
+          showCopied(false);
+          setTimeout(() => {
+            showCopied(true);
+            timer.current = setTimeout(() => {
+              showCopied(false);
+            }, 3000);
+          }, 10); 
         }} />
       <div className='flex border-collapse flex-row max-[514px]:flex-col max-[514px]:w-65 max-[514px]:items-center max-[514px]:justify-center border 
       xl:gap-4 items-start w-full'>
