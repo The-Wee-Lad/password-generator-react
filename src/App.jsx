@@ -4,7 +4,7 @@ import TextArea from './TextArea.jsx'
 import Notification from './Notification.jsx';
 
 document.body.style.backgroundColor = "#222222";
-const minLength = 8, maxLength = 50, leastCheck = 1;
+const minLength = 8, maxLength = 50, leastCheck = 1, retention = 2000;
 const collection = {
   LCharacters: "qwertyuiopasdfghjklzmxncbv",
   UCharacters: "QWERTYUIOPASDFGHJKLZXCVBNM",
@@ -56,13 +56,12 @@ function App() {
           window.navigator.clipboard.writeText(password);
           textArea.current.select()
           clearTimeout(timer.current);
-          showCopied(true);
           showCopied(false);
           setTimeout(() => {
             showCopied(true);
             timer.current = setTimeout(() => {
               showCopied(false);
-            }, 3000);
+            }, retention);
           }, 10); 
         }} />
       <div className='flex border-collapse flex-row max-[514px]:flex-col max-[514px]:w-65 max-[514px]:items-center max-[514px]:justify-center border 
