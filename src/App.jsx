@@ -1,47 +1,65 @@
-import { useState } from 'react'
-import './App.css'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import Checkbox from './Checkbox.jsx';
+import TextArea from './TextArea.jsx'
+import Notification from './Notification.jsx';
 
+document.body.style.backgroundColor = "#222222";
 const minLength = 8, maxLength = 50, leastCheck = 1;
 const collection = {
-  Characters: "qwertyuiopasdfghjklzmxncbv",
+  LCharacters: "qwertyuiopasdfghjklzmxncbv",
+  UCharacters: "QWERTYUIOPASDFGHJKLZXCVBNM",
   Numbers: "1234567890",
   Symbols: " ~!@#$%^&*()_+`{}|:\"<>?,./;'[]`"
 }
+const map = {
+  "LCharacters": "Lower Case",
+  "UCharacters": "Upper Case",
+  "Numbers": "Numbers",
+  "Symbols": "Symbols",
+  "random": "256-Bit-Random"
+}
+const defaultSetting = { LCharacters: true, Numbers: true, UCharacters:true };
 
 
 function App() {
-  document.body.style.backgroundColor = "#222222";
   const [disableSlider, setDisableSlider] = useState(false);
-  const passwordGenerator = () => {
+  const [length, setLength] = useState(minLength);
+  const [parameters, setParameters] = useState(defaultSetting);
+  const [password, setPassword] = useState(null);
+  const textArea = useRef(null);
+  const [copied, showCopied] = useState(false);
+  const passwordGenerator = useCallback(() => {
     let options = parameters;
     let poolString = "";
     let password = "";
-    if (options["256Bit"])
+    if (options["random"])
       password = crypto.getRandomValues(new Uint8Array(32)).reduce((s, b) => s + b.toString(16).padStart(2, '0'), '');
     else {
       for (const key in options)
         if (options[key])
           poolString += collection[key];
-      for (let i = 0; i < length; i++) 
+      for (let i = 0; i < (length < 8 ? 8 : length); i++)
         password += poolString[((min, max) => Math.floor(Math.random() * (max - min)) + min)(0, poolString.length)];
     }
-    return password;
-  }
-  const [length, setLength] = useState(minLength);
-  const defaultSetting = { Characters: true, Numbers: true };
-  const [parameters, setParameters] = useState(defaultSetting);
-  const [password, setPassword] = useState(passwordGenerator());
-
+    setPassword(password);
+  }, [parameters, length, setPassword]);
+  useEffect(passwordGenerator, [parameters, length, passwordGenerator]);
   return (
     <div className='m-auto text-center mt-20 min-[688px]:w-[75%] min-[860px]:w-[60%] xl:w-[42%]  min-[1029px]:w-[50%] bg-[white] p-2 border-2 border-gray-500 flex flex-col items-center gap-2'>
+      {copied && <Notification/>}
       <h1 className='text-2xl font-bold text-center'>Password Generator</h1>
-      <div className='flex flex-row w-full'>
-        <div className='border-1 p-1 w-[80%] font-mono overflow-auto'>
-          {password}
-        </div>
-        <div className='bg-blue-500 border border-blue-500 p-1 w-[20%] text-center text-bol hover:bg-black hover:text-white hover:border-black font-medium text-lg'>Copy</div>
-      </div>
+      <TextArea
+        password={password}
+        textArea={textArea}
+        copy={() => {
+          window.navigator.clipboard.writeText(password);
+          textArea.current.select()
+          console.log(textArea);
+          showCopied(true);
+          setTimeout(() => {
+            showCopied(false);
+          }, 3000);
+        }} />
       <div className='flex border-collapse flex-row max-[514px]:flex-col max-[514px]:w-65 max-[514px]:items-center max-[514px]:justify-center border 
       xl:gap-4 items-start w-full'>
         <div className='flex flex-col w-[45%] max-[514px]:self-auto max-[514px]:w-full self-stretch max-[514px]:order-3 '>
@@ -81,13 +99,15 @@ function App() {
           <div className='flex flex-row justify-center items-center
           bg-red-400 hover:bg-gray-800 hover:text-white 
           text-lg h-full font-medium hover max-[514px]:h-[2.5rem]'
-            onClick={() => { setPassword(passwordGenerator()) }}>
+            onClick={() => {
+              passwordGenerator();
+            }}>
             Generate New One
           </div>
         </div>
 
-        <div className='bg-blue-300 p-1 max-[514px]:w-full w-fit min-[514px]:border-x-1'>
-          {["Characters", "Numbers", "Symbols"].map((element) => {
+        <div className='bg-blue-300 p-1 w-full min-[514px]:border-x-1'>
+          {["LCharacters", "UCharacters", "Numbers", "Symbols"].map((element) => {
             return <Checkbox key={element} type={element}
               element={element} checked={parameters[element] ?? false}
               disabled={disableSlider}
@@ -95,18 +115,18 @@ function App() {
                 if (!(e.target.checked) && (Object.entries(parameters).filter((ele) => (ele[1])).length <= leastCheck))
                   return;
                 setParameters({ ...parameters, [element]: (e.target.checked) });
-              }}>{element}</Checkbox>
+              }}>{map[element]}</Checkbox>
           })}
         </div>
 
         <div className='bg-pink-300 p-1 max-[514px]:w-full w-full border-b-1   min-[514px]:border-x-1' >
-          <Checkbox key={"256Bit"} type={"256Bit"}
-            element={"256Bit"} checked={disableSlider}
+          <Checkbox key={"random"} type={"random"}
+            element={"random"} checked={disableSlider}
             onChange={(e) => {
               setDisableSlider(prev => (!prev));
-              setParameters({ ...parameters, ["256Bit"]: (e.target.checked) });
+              setParameters({ ...parameters, ["random"]: (e.target.checked) });
             }}>
-            256-Bit-Random
+            {map["random"]}
           </Checkbox>
         </div>
       </div>
