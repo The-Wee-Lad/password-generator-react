@@ -47,7 +47,7 @@ function App() {
   return (
     <div className='m-auto text-center mt-20 min-[688px]:w-[75%] min-[860px]:w-[60%] xl:w-[42%]  min-[1029px]:w-[50%] bg-[white] p-2 border-2 border-gray-500 flex flex-col items-center gap-2'>
       {copied && <Notification/>}
-      <h1 className='text-2xl font-bold text-center'>Password Generator</h1>
+      <h1 className='text-4xl font-bold text-center' style={{ fontFamily: "'Staatliches', sans-serif" }}>Password Generator</h1>
       <TextArea
         password={password}
         textArea={textArea}
@@ -98,7 +98,8 @@ function App() {
           </div>
           <div className='flex flex-row justify-center items-center
           bg-red-400 hover:bg-gray-800 hover:text-white 
-          text-lg h-full font-medium hover max-[514px]:h-[2.5rem]'
+          text-lg h-full font-medium hover max-[514px]:h-[2.5rem]
+          font-[cinzel] font-semibold'
             onClick={() => {
               passwordGenerator();
             }}>
