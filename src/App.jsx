@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import './App.css'
+import Checkbox from './Checkbox.jsx';
 
-const minLength = 8, maxLength = 50;
+const minLength = 8, maxLength = 50, leastCheck = 1;
 const collection = {
   Characters: "qwertyuiopasdfghjklzmxncbv",
   Numbers: "1234567890",
@@ -12,65 +13,26 @@ const collection = {
 function App() {
   document.body.style.backgroundColor = "#222222";
   const [disableSlider, setDisableSlider] = useState(false);
-  const checkboxGenerator = (element) => {
-    return (<div className='flex items-center space-x-2'
-      key={element}
-      >
-      <input className='h-4 w-4 accent-black border-2 
-      border-black rounded-sm cursor-pointer'
-        checked={parameters[element] ?? false}
-        type="checkbox"
-        name="parameters" id="characters"
-        onChange={(e) => {
-          console.log(parameters, "Status ", element, e.target.checked);
-          console.log(Object.entries(parameters));
-          console.log(Object.entries(parameters).filter(
-            (ele) => (ele[0] != "256-Bit Random" && ele[1])));
-          console.log(element && element == "256-Bit Random");
-
-          if (element == "256-Bit Random") {
-            setDisableSlider(e.target.checked);
-            setParameters({
-              ...(!e.target.checked ? defaultSetting : {}),
-              [element]: (e.target.checked)
-            });
-            return;
-          } else if (element != "256-Bit Random" && parameters["256-Bit Random"]) {
-            return;
-          }
-          else if (!(e.target.checked) &&
-            Object.entries(parameters).filter((ele) => (ele[0] != "256-Bit Random" && ele[1])).length <= 2
-          )
-            return;
-          setParameters({ ...parameters, [element]: (e.target.checked) });
-        }} />
-      <label className="font-medium cursor-pointer select-none" htmlFor="characters">{element}</label>
-    </div>);
-  }
-  const passwordGenerator = ()=>{
+  const passwordGenerator = () => {
     let options = parameters;
     let poolString = "";
     let password = "";
-    if (options["256-Bit Random"]) {
+    if (options["256Bit"])
       password = crypto.getRandomValues(new Uint8Array(32)).reduce((s, b) => s + b.toString(16).padStart(2, '0'), '');
-    } else {
-      for (const key in options) {
-        if (options[key]) {
+    else {
+      for (const key in options)
+        if (options[key])
           poolString += collection[key];
-        }
-      }
-      for (let i = 0; i < length; i++) {
+      for (let i = 0; i < length; i++) 
         password += poolString[((min, max) => Math.floor(Math.random() * (max - min)) + min)(0, poolString.length)];
-      }
     }
-    console.log(password, poolString);
     return password;
   }
   const [length, setLength] = useState(minLength);
   const defaultSetting = { Characters: true, Numbers: true };
   const [parameters, setParameters] = useState(defaultSetting);
   const [password, setPassword] = useState(passwordGenerator());
-  
+
   return (
     <div className='m-auto text-center mt-20 min-[688px]:w-[75%] min-[860px]:w-[60%] xl:w-[42%]  min-[1029px]:w-[50%] bg-[white] p-2 border-2 border-gray-500 flex flex-col items-center gap-2'>
       <h1 className='text-2xl font-bold text-center'>Password Generator</h1>
@@ -80,7 +42,7 @@ function App() {
         </div>
         <div className='bg-blue-500 border border-blue-500 p-1 w-[20%] text-center text-bol hover:bg-black hover:text-white hover:border-black font-medium text-lg'>Copy</div>
       </div>
-      <div className='flex flex-row max-[514px]:flex-col max-[514px]:w-65 max-[514px]:items-center max-[514px]:justify-center border 
+      <div className='flex border-collapse flex-row max-[514px]:flex-col max-[514px]:w-65 max-[514px]:items-center max-[514px]:justify-center border 
       xl:gap-4 items-start w-full'>
         <div className='flex flex-col w-[45%] max-[514px]:self-auto max-[514px]:w-full self-stretch max-[514px]:order-3 '>
           <div className='flex flex-row gap-2 justify-center items-center bg-amber-300 w-full '>
@@ -117,23 +79,38 @@ function App() {
             />
           </div>
           <div className='flex flex-row justify-center items-center
-          bg-red-400 hover:bg-gray-500 hover:text-white 
+          bg-red-400 hover:bg-gray-800 hover:text-white 
           text-lg h-full font-medium hover max-[514px]:h-[2.5rem]'
-          onClick={()=>{setPassword( passwordGenerator())}}
-          >
+            onClick={() => { setPassword(passwordGenerator()) }}>
             Generate New One
           </div>
         </div>
 
-        <div className='bg-blue-200 p-1 max-[514px]:w-full w-fit'>
-          {["Characters", "Numbers", "Symbols"].map(checkboxGenerator)}
+        <div className='bg-blue-300 p-1 max-[514px]:w-full w-fit min-[514px]:border-x-1'>
+          {["Characters", "Numbers", "Symbols"].map((element) => {
+            return <Checkbox key={element} type={element}
+              element={element} checked={parameters[element] ?? false}
+              disabled={disableSlider}
+              onChange={(e) => {
+                if (!(e.target.checked) && (Object.entries(parameters).filter((ele) => (ele[1])).length <= leastCheck))
+                  return;
+                setParameters({ ...parameters, [element]: (e.target.checked) });
+              }}>{element}</Checkbox>
+          })}
         </div>
 
-        <div className='bg-red-200 p-1 max-[514px]:w-full w-fit'>
-          {checkboxGenerator("256-Bit Random")}
+        <div className='bg-pink-300 p-1 max-[514px]:w-full w-full border-b-1   min-[514px]:border-x-1' >
+          <Checkbox key={"256Bit"} type={"256Bit"}
+            element={"256Bit"} checked={disableSlider}
+            onChange={(e) => {
+              setDisableSlider(prev => (!prev));
+              setParameters({ ...parameters, ["256Bit"]: (e.target.checked) });
+            }}>
+            256-Bit-Random
+          </Checkbox>
         </div>
       </div>
-    </div>
+    </div >
   )
 }
 
