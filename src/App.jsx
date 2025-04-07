@@ -18,13 +18,13 @@ const map = {
   "Symbols": "Symbols",
   "random": "256-Bit-Random"
 }
-const defaultSetting = { LCharacters: true, Numbers: true, UCharacters:true };
+const defaultSetting = { LCharacters: true, Numbers: true, UCharacters: true };
 
 function App() {
   const [disableSlider, setDisableSlider] = useState(false);
   const [length, setLength] = useState(minLength);
   const [parameters, setParameters] = useState(defaultSetting);
-  const [password, setPassword] = useState(null);
+  const [password, setPassword] = useState('');
   const textArea = useRef(null);
   let timer = useRef(null);
 
@@ -47,7 +47,7 @@ function App() {
   useEffect(passwordGenerator, [parameters, length, passwordGenerator]);
   return (
     <div className=' select-none m-auto text-center mt-20 min-[688px]:w-[75%] min-[860px]:w-[60%] xl:w-[42%]  min-[1029px]:w-[50%] bg-[white] p-2 border-2 border-gray-500 flex flex-col items-center gap-2'>
-      {copied && <Notification/>}
+      {copied && <Notification retention={retention}/>}
       <h1 className='text-4xl font-bold text-center' style={{ fontFamily: "'Staatliches', sans-serif" }}>Password Generator</h1>
       <TextArea
         password={password}
@@ -62,8 +62,9 @@ function App() {
             timer.current = setTimeout(() => {
               showCopied(false);
             }, retention);
-          }, 10); 
-        }} />
+          }, 10);
+        }}
+      />
       <div className='flex border-collapse flex-row max-[514px]:flex-col max-[514px]:w-65 max-[514px]:items-center max-[514px]:justify-center border 
       xl:gap-4 items-start w-full'>
         <div className='flex flex-col w-[45%] max-[514px]:self-auto max-[514px]:w-full self-stretch max-[514px]:order-3 '>
