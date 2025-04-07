@@ -19,7 +19,6 @@ const map = {
   "random": "256-Bit-Random"
 }
 const defaultSetting = { LCharacters: true, Numbers: true, UCharacters:true };
-let timer = null;
 
 function App() {
   const [disableSlider, setDisableSlider] = useState(false);
@@ -27,6 +26,8 @@ function App() {
   const [parameters, setParameters] = useState(defaultSetting);
   const [password, setPassword] = useState(null);
   const textArea = useRef(null);
+  let timer = useRef(null);
+
   const [copied, showCopied] = useState(false);
   const passwordGenerator = useCallback(() => {
     let options = parameters;
@@ -55,9 +56,9 @@ function App() {
           window.navigator.clipboard.writeText(password);
           textArea.current.select()
           console.log(textArea);
-          clearTimeout(timer);
+          clearTimeout(timer.current);
           showCopied(true);
-          timer = setTimeout(() => {
+          timer.current = setTimeout(() => {
             showCopied(false);
           }, 3000);
         }} />
